@@ -35,7 +35,7 @@ class JsonFileActionsTest extends TestCase
         file_put_contents($path, '{broken');
 
         $this->expectException(InvalidFileContentException::class);
-        $this->expectExceptionMessage('Invalid JSON.');
+        $this->expectExceptionMessageIs('Invalid JSON.');
 
         $json->read($path);
     }

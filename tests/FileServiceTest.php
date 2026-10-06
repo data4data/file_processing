@@ -9,12 +9,13 @@ use App\Exception\UnsupportedFormatException;
 use App\Service\FileNameResolver;
 use App\Service\FileService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 class FileServiceTest extends TestCase
 {
-    private FileActionsInterface $csv;
+    private FileActionsInterface&MockObject $csv;
     private FileService $service;
 
     protected function setUp(): void
@@ -40,7 +41,7 @@ class FileServiceTest extends TestCase
     public function testUnsupportedFormat(): void
     {
         $this->expectException(UnsupportedFormatException::class);
-        $this->expectExceptionMessage('Format "txt" is not supported. Allowed: csv.');
+        $this->expectExceptionMessageIs('Format "txt" is not supported. Allowed: csv.');
 
         $this->service->read('fruits.txt');
     }

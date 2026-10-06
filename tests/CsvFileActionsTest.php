@@ -33,7 +33,7 @@ class CsvFileActionsTest extends TestCase
         $csv = new CsvFileActions();
 
         $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessage('File "missing.csv" not found.');
+        $this->expectExceptionMessageIs('File "missing.csv" not found.');
 
         $csv->read(sys_get_temp_dir() . '/missing.csv');
     }
