@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use App\Exception\FileNotFoundException;
@@ -8,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class CsvFileActionsTest extends TestCase
 {
-    public function testWriteReadAndDelete(): void
+    public function testWriteAndRead(): void
     {
         $csv = new CsvFileActions();
         $path = sys_get_temp_dir() . '/fruits_test.csv';
@@ -23,8 +25,7 @@ class CsvFileActionsTest extends TestCase
 
         $this->assertSame($data, $csv->read($path));
 
-        $csv->delete($path);
-        $this->assertFileDoesNotExist($path);
+        unlink($path);
     }
 
     public function testReadMissingFile(): void

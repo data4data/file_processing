@@ -1,28 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FileActions;
 
 use App\Contract\FileActionsInterface;
 use App\Exception\FileNotFoundException;
+use App\Exception\StorageException;
 
 abstract class AbstractFileActions implements FileActionsInterface
 {
-    public function supports(string $extension): bool
+    protected function checkFileExists(string $path): void
     {
-        return strtolower($extension) === $this->getFormat();
+        if (!is_file($path)) {
+            throw new FileNotFoundException(basename($path));
+        }
     }
 
-    public function delete(string $path): void
+    protected function readContent(string $path): string
     {
         $this->checkFileExists($path);
 
-        unlink($path);
+        $content = file_get_contents($path);
+
+        if ($content === false) {
+            throw new StorageException('Could not read file "' . basename($path) . '".');
+        }
+
+        return $content;
     }
 
-    protected function checkFileExists(string $path): void
+    protected function saveContent(string $path, string $content): void
     {
-        if (!file_exists($path)) {
-            throw new FileNotFoundException(basename($path));
+        if (file_put_contents($path, $content, LOCK_EX) === false) {
+            throw new StorageException('Could not save file "' . basename($path) . '".');
         }
     }
 }

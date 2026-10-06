@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use App\Contract\FileActionsInterface;
-use App\Exception\MethodNotAllowedException;
 use App\Exception\UnsupportedFormatException;
-use App\Http\Request;
 use App\Service\FileNameResolver;
 use App\Service\FileService;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class FileServiceTest extends TestCase
 {
     private FileActionsInterface $csv;
@@ -19,23 +21,20 @@ class FileServiceTest extends TestCase
     {
         $this->csv = $this->createMock(FileActionsInterface::class);
         $this->csv->method('getFormat')->willReturn('csv');
-        $this->csv->method('supports')->willReturnCallback(fn ($extension) => $extension === 'csv');
 
         $this->service = new FileService('/storage', [$this->csv], new FileNameResolver());
     }
 
-    public function testReadAction(): void
+    public function testRead(): void
     {
         $this->csv->expects($this->once())
             ->method('read')
             ->with('/storage/fruits.csv')
             ->willReturn([['fruit' => 'apple'], ['fruit' => 'pear']]);
 
-        $response = $this->service->handle(new Request('GET', ['action' => 'read', 'file' => 'fruits.csv']));
+        $data = $this->service->read('fruits.csv');
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('File "fruits.csv" has 2 records.', $response->getData()['message']);
-        $this->assertEquals([['fruit' => 'apple'], ['fruit' => 'pear']], $response->getData()['data']);
+        $this->assertEquals([['fruit' => 'apple'], ['fruit' => 'pear']], $data);
     }
 
     public function testUnsupportedFormat(): void
@@ -43,16 +42,18 @@ class FileServiceTest extends TestCase
         $this->expectException(UnsupportedFormatException::class);
         $this->expectExceptionMessage('Format "txt" is not supported. Allowed: csv.');
 
-        $this->service->handle(new Request('GET', ['action' => 'read', 'file' => 'fruits.txt']));
+        $this->service->read('fruits.txt');
     }
 
-    public function testDeleteWithWrongMethod(): void
+    public function testDelete(): void
     {
-        $this->csv->expects($this->never())->method('delete');
+        $folder = sys_get_temp_dir();
+        $path = $folder . '/fruits_delete_test.csv';
+        file_put_contents($path, "id,fruit\n1,apple\n");
+        $service = new FileService($folder, [$this->csv], new FileNameResolver());
 
-        $this->expectException(MethodNotAllowedException::class);
-        $this->expectExceptionMessage('Action "delete" requires DELETE, got GET.');
+        $service->delete('fruits_delete_test.csv');
 
-        $this->service->handle(new Request('GET', ['action' => 'delete', 'file' => 'fruits.csv']));
+        $this->assertFileDoesNotExist($path);
     }
 }

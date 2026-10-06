@@ -1,13 +1,14 @@
 {
-    "name": "olaantonuk/file-reader-php",
+    "name": "olaantonuk/file_processing",
     "description": "Simple service for reading, writing and deleting csv and json files",
     "type": "project",
     "require": {
-        "php": ">=8.1",
-        "ext-json": "*"
+        "php": ">=8.4",
+        "ext-json": "*",
+        "symfony/http-foundation": "^8.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.5"
+        "phpunit/phpunit": "^13.4"
     },
     "autoload": {
         "psr-4": {

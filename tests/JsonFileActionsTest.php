@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use App\Exception\InvalidFileContentException;
@@ -8,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class JsonFileActionsTest extends TestCase
 {
-    public function testWriteReadAndDelete(): void
+    public function testWriteAndRead(): void
     {
         $json = new JsonFileActions();
         $path = sys_get_temp_dir() . '/vegetables_test.json';
@@ -23,8 +25,7 @@ class JsonFileActionsTest extends TestCase
 
         $this->assertSame($data, $json->read($path));
 
-        $json->delete($path);
-        $this->assertFileDoesNotExist($path);
+        unlink($path);
     }
 
     public function testReadInvalidJson(): void
@@ -34,7 +35,7 @@ class JsonFileActionsTest extends TestCase
         file_put_contents($path, '{broken');
 
         $this->expectException(InvalidFileContentException::class);
-        $this->expectExceptionMessage('File "broken_test.json" contains invalid JSON.');
+        $this->expectExceptionMessage('Invalid JSON.');
 
         $json->read($path);
     }

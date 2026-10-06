@@ -1,11 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exception;
 
 class InvalidFileContentException extends FileServiceException
 {
-    public function getStatusCode(): int
-    {
-        return 422;
-    }
 }

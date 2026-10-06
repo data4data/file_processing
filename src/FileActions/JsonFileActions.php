@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FileActions;
 
 use App\Exception\InvalidFileContentException;
@@ -16,12 +18,10 @@ class JsonFileActions extends AbstractFileActions
 
     public function read(string $path): array
     {
-        $this->checkFileExists($path);
-
-        $data = $this->decodeJson(file_get_contents($path));
+        $data = $this->decodeJson($this->readContent($path));
 
         if ($data === null) {
-            throw new InvalidFileContentException('File "' . basename($path) . '" contains invalid JSON.');
+            throw new InvalidFileContentException('Invalid JSON.');
         }
 
         return $data;
@@ -29,6 +29,6 @@ class JsonFileActions extends AbstractFileActions
 
     public function write(string $path, array $data): void
     {
-        file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT));
+        $this->saveContent($path, json_encode($data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
     }
 }

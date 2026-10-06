@@ -9,7 +9,7 @@ function loadFiles(selectedFile) {
         $('#file').empty();
 
         $.each(response.data, function (index, fileName) {
-            $('#file').append('<option>' + fileName + '</option>');
+            $('#file').append($('<option>').text(fileName));
         });
 
         if (selectedFile) {

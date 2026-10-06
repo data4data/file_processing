@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exception;
 
 class UnsupportedFormatException extends FileServiceException
@@ -13,10 +15,5 @@ class UnsupportedFormatException extends FileServiceException
         } else {
             parent::__construct('Format "' . $extension . '" is not supported. Allowed: ' . $formats . '.');
         }
-    }
-
-    public function getStatusCode(): int
-    {
-        return 400;
     }
 }
